@@ -1,6 +1,10 @@
 #ifndef TRIANGLE_RENDERER_H
 #define TRIANGLE_RENDERER_H
 
+#include <string>
+
+using namespace std;
+
 class TriangleRenderer {
 public:
     TriangleRenderer();
@@ -17,6 +21,7 @@ private:
 
     unsigned int compileShader(unsigned int type, const char* source) const;
     unsigned int createProgram(const char* vertexSource, const char* fragmentSource) const;
+    string loadShader(const string path) const;
 };
 
 #endif

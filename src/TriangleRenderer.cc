@@ -1,7 +1,12 @@
 #include "TriangleRenderer.hh"
 
 #include <GL/glew.h>
+#include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
+
+using namespace std;
 
 TriangleRenderer::TriangleRenderer()
     : m_vao(0)
@@ -16,19 +21,11 @@ TriangleRenderer::~TriangleRenderer()
 
 bool TriangleRenderer::initialize()
 {
-    static const char* vertexShaderSource =
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main() {\n"
-        "    gl_Position = vec4(aPos, 1.0);\n"
-        "}\n";
+    const string vertexCode = loadShader("src/vertex.glsl");
+    static const char* vertexShaderSource = vertexCode.c_str();
 
-    static const char* fragmentShaderSource =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    FragColor = vec4(0.95, 0.40, 0.20, 1.0);\n"
-        "}\n";
+    const string fragmentCode = loadShader("src/fragment.glsl");
+    static const char* fragmentShaderSource = fragmentCode.c_str();
 
     m_program = createProgram(vertexShaderSource, fragmentShaderSource);
     if (m_program == 0)
@@ -36,9 +33,8 @@ bool TriangleRenderer::initialize()
         return false;
     }
 
-    const float vertices[] = { 0.0f,  0.6f, 0.0f,
-                              -0.6f, -0.6f, 0.0f, 
-                               0.6f, -0.6f, 0.0f };
+    const float vertices[] = { 0.0f, 0.6f, 0.0f,  -0.6f, -0.6f,
+                               0.0f, 0.6f, -0.6f, 0.0f };
 
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
@@ -152,4 +148,12 @@ unsigned int TriangleRenderer::createProgram(const char* vertexSource,
     glDeleteShader(fragmentShader);
 
     return program;
+}
+
+string TriangleRenderer::loadShader(const string path) const
+{
+    std::ifstream file(path);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
 }
