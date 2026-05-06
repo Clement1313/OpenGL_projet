@@ -1,7 +1,7 @@
 #include "App.hh"
 
-#include <GL/freeglut.h>
 #include <GL/glew.h>
+#include <GL/freeglut.h>
 #include <iostream>
 
 App* App::s_instance = nullptr;

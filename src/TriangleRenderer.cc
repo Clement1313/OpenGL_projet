@@ -36,8 +36,9 @@ bool TriangleRenderer::initialize()
         return false;
     }
 
-    const float vertices[] = { 0.0f, 0.6f, 0.0f,  -0.6f, -0.6f,
-                               0.0f, 0.6f, -0.6f, 0.0f };
+    const float vertices[] = { 0.0f,  0.6f, 0.0f,
+                              -0.6f, -0.6f, 0.0f, 
+                               0.6f, -0.6f, 0.0f };
 
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
