@@ -1,11 +1,11 @@
 #include "FireRenderer.hh"
 
 #include <GL/glew.h>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cstddef>
 
 FireRenderer::FireRenderer()
     : m_vao(0)
@@ -32,46 +32,17 @@ bool FireRenderer::initialize()
         return false;
     }
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    // glEnable(GL_BLEND); // Particles tranparancy
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    const Particle particles[6] = { { { 0.00f, 0.00f, 0.00f },
-                                      { 0.00f, 0.30f, 0.00f },
-                                      1.00f,
-                                      1.00f,
-                                      { 1.00f, 0.55f, 0.10f, 1.00f },
-                                      0.10f },
-                                    { { -0.08f, 0.08f, 0.00f },
-                                      { -0.02f, 0.38f, 0.00f },
-                                      0.95f,
-                                      1.00f,
-                                      { 1.00f, 0.45f, 0.08f, 1.00f },
-                                      0.09f },
-                                    { { 0.08f, 0.10f, 0.00f },
-                                      { 0.02f, 0.36f, 0.00f },
-                                      0.92f,
-                                      1.00f,
-                                      { 1.00f, 0.62f, 0.16f, 1.00f },
-                                      0.11f },
-                                    { { -0.14f, 0.02f, 0.00f },
-                                      { -0.04f, 0.28f, 0.00f },
-                                      0.88f,
-                                      1.00f,
-                                      { 0.95f, 0.35f, 0.05f, 1.00f },
-                                      0.08f },
-                                    { { 0.14f, 0.04f, 0.00f },
-                                      { 0.04f, 0.32f, 0.00f },
-                                      0.84f,
-                                      1.00f,
-                                      { 1.00f, 0.70f, 0.20f, 1.00f },
-                                      0.12f },
-                                    { { 0.00f, 0.16f, 0.00f },
-                                      { 0.00f, 0.42f, 0.00f },
-                                      0.90f,
-                                      1.00f,
-                                      { 1.00f, 0.82f, 0.35f, 1.00f },
-                                      0.13f } };
+
+    size_t nbParticles = 10;
+    Particle particles[nbParticles];
+    for (size_t i = 0; i < nbParticles; i++)
+    {
+        particles[i] = genParticle();
+    }
 
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
@@ -84,13 +55,15 @@ bool FireRenderer::initialize()
     const GLsizei stride = static_cast<GLsizei>(sizeof(Particle));
 
     // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void*>(offsetof(Particle, position)));
+    glVertexAttribPointer(
+        0, 3, GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void*>(offsetof(Particle, position)));
     glEnableVertexAttribArray(0);
 
     // Velocity
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void*>(offsetof(Particle, velocity)));
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, stride,
+        reinterpret_cast<void*>(offsetof(Particle, velocity)));
     glEnableVertexAttribArray(1);
 
     // Life
@@ -124,7 +97,7 @@ void FireRenderer::render(float timeSeconds) const
     glUseProgram(m_program);
     int timeLoc = glGetUniformLocation(m_program, "uTime");
     glUniform1f(timeLoc, timeSeconds);
-    
+
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, 6);
     glBindVertexArray(0);
@@ -224,4 +197,21 @@ string FireRenderer::loadShader(const string path) const
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
+}
+
+float FireRenderer::random(float maxVal) const
+{
+    return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / maxVal));
+}
+
+Particle FireRenderer::genParticle() const
+{
+    float test = random(1);
+
+    vec3 pos = { random(2) - 1.0f, random(1) - 1.0f, random(1) - 1.0f };
+    vec3 vel = { 0.f, 0.3f + random(0.2), 0.f };
+    vec4 col = { 1.00f - random(0.3f), random(0.50f), 0.0f + random(0.2f),
+                 1.00f };
+    Particle res = { pos, vel, 0.90f, 1.0f, col, 0.2f };
+    return res;
 }
