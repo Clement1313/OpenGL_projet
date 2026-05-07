@@ -11,6 +11,7 @@ find_package(GLUT REQUIRED)
 add_executable(OpenGLTriangle
     main.cc
     src/App.cc
+    src/FireRenderer.cc
     src/TriangleRenderer.cc
 )
 

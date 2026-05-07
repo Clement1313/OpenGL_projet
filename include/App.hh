@@ -1,7 +1,7 @@
 #ifndef APP_H
 #define APP_H
 
-#include "TriangleRenderer.hh"
+#include "FireRenderer.hh"
 
 class App {
 public:
@@ -16,7 +16,7 @@ private:
     int m_argc;
     char** m_argv;
     int m_windowId;
-    TriangleRenderer m_renderer;
+    FireRenderer m_renderer;
 
     static void displayCallback();
     static void reshapeCallback(int width, int height);

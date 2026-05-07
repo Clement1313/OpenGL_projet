@@ -87,7 +87,8 @@ void App::display()
     glClearColor(0.08f, 0.10f, 0.12f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_renderer.render();
+    float timeSeconds = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+    m_renderer.render(timeSeconds);
 
     glutSwapBuffers();
     glutPostRedisplay();
