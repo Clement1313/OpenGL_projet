@@ -15,13 +15,20 @@ out float vertexLife;
 out float vertexMaxLife;
 
 void main() {
+    /* 
+        TODO:
+            - change particles color : white/yellow/orange/red
+            - change transparency : more tranparency as time goes
+            - add lateral movement : random small change to break linearity
+            - change velocity over time : fast motion -> slower motion
+    */
     float age = mod(uTime + lifetime, max(maxlife, 1e-4));
     float lifeRatio = 1.0 - (age / max(maxlife, 1e-4));
     vec3 newPosition = position + velocity * age;
     gl_Position = vec4(newPosition, 1.0);
-    gl_PointSize = max(1.0, size * 80.0);
+    gl_PointSize = max(1.0, size * lifeRatio * 80.0);
     vertexColor = color;
-    vertexSize = size;
+    vertexSize = size * lifeRatio;
     vertexLife = lifeRatio;
     vertexMaxLife = 1.0;
 }

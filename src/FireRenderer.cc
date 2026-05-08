@@ -212,8 +212,8 @@ Particle FireRenderer::genParticle(const vec3 origin) const
     vec3 pos = { origin.x + random(0.4f) - 0.2f, origin.y + random(0.05f),
                  origin.z };
     vec3 vel = { 0.f, 0.3f + random(0.2f), 0.f };
-    vec4 col = { 1.00f - random(0.3f), random(0.50f), 0.0f + random(0.2f),
+    vec4 col = { 1.00f - random(0.2f), random(0.30f), 0.0f + random(0.2f),
                  1.00f };
-    Particle res = { pos, vel, random(1.0f), 1.0f, col, 0.2f };
+    Particle res = { pos, vel, random(1.0f), 1.0f, col, 0.15f };
     return res;
 }

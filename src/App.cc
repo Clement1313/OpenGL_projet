@@ -84,7 +84,7 @@ void App::closeCallback()
 
 void App::display()
 {
-    glClearColor(0.08f, 0.10f, 0.12f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     float timeSeconds = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
