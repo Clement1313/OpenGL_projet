@@ -20,6 +20,4 @@ void main() {
     
     vec3 color = vertexColor.rgb;
     FragColor = vec4(color * (0.6 + 0.8 * falloff), alpha * falloff);
-    
-    FragColor = vec4(color, alpha);
 }

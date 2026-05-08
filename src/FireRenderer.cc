@@ -11,6 +11,7 @@ FireRenderer::FireRenderer()
     : m_vao(0)
     , m_vbo(0)
     , m_program(0)
+    , m_particleCount(0)
 {}
 
 FireRenderer::~FireRenderer()
@@ -32,16 +33,18 @@ bool FireRenderer::initialize()
         return false;
     }
 
-    // glEnable(GL_BLEND); // Particles tranparancy
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glEnable(GL_BLEND); // Particles transparency
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-
+    vec3 origin = { 0.00f, 0.00f, 0.00f };
     size_t nbParticles = 10;
+    m_particleCount = static_cast<int>(nbParticles);
     Particle particles[nbParticles];
     for (size_t i = 0; i < nbParticles; i++)
     {
-        particles[i] = genParticle();
+        particles[i] = genParticle(origin);
     }
 
     glGenVertexArrays(1, &m_vao);
@@ -99,7 +102,7 @@ void FireRenderer::render(float timeSeconds) const
     glUniform1f(timeLoc, timeSeconds);
 
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_POINTS, 0, 6);
+    glDrawArrays(GL_POINTS, 0, m_particleCount);
     glBindVertexArray(0);
     glUseProgram(0);
 }
@@ -204,14 +207,13 @@ float FireRenderer::random(float maxVal) const
     return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / maxVal));
 }
 
-Particle FireRenderer::genParticle() const
+Particle FireRenderer::genParticle(const vec3 origin) const
 {
-    float test = random(1);
-
-    vec3 pos = { random(2) - 1.0f, random(1) - 1.0f, random(1) - 1.0f };
-    vec3 vel = { 0.f, 0.3f + random(0.2), 0.f };
+    vec3 pos = { origin.x + random(0.4f) - 0.2f, origin.y + random(0.05f),
+                 origin.z };
+    vec3 vel = { 0.f, 0.3f + random(0.2f), 0.f };
     vec4 col = { 1.00f - random(0.3f), random(0.50f), 0.0f + random(0.2f),
                  1.00f };
-    Particle res = { pos, vel, 0.90f, 1.0f, col, 0.2f };
+    Particle res = { pos, vel, random(1.0f), 1.0f, col, 0.2f };
     return res;
 }

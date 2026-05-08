@@ -29,12 +29,13 @@ private:
     unsigned int m_vao;
     unsigned int m_vbo;
     unsigned int m_program;
+    int m_particleCount;
 
     unsigned int compileShader(unsigned int type, const char* source) const;
     unsigned int createProgram(const char* vertexSource,
                                const char* fragmentSource) const;
     string loadShader(const string path) const;
-    Particle genParticle() const;
+    Particle genParticle(const vec3 origin) const;
     float random(float maxVal) const;
 };
 
