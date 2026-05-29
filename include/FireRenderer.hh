@@ -22,6 +22,7 @@ public:
     ~FireRenderer();
 
     bool initialize();
+    void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix);
     void render(float timeSeconds) const;
     void cleanup();
 
@@ -30,6 +31,8 @@ private:
     unsigned int m_vbo;
     unsigned int m_program;
     int m_particleCount;
+    float m_viewMatrix[16];
+    float m_projectionMatrix[16];
 
     unsigned int compileShader(unsigned int type, const char* source) const;
     unsigned int createProgram(const char* vertexSource,

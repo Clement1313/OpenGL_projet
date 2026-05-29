@@ -12,7 +12,23 @@ FireRenderer::FireRenderer()
     , m_vbo(0)
     , m_program(0)
     , m_particleCount(0)
-{}
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        m_viewMatrix[i] = 0.0f;
+        m_projectionMatrix[i] = 0.0f;
+    }
+
+    m_viewMatrix[0] = 1.0f;
+    m_viewMatrix[5] = 1.0f;
+    m_viewMatrix[10] = 1.0f;
+    m_viewMatrix[15] = 1.0f;
+
+    m_projectionMatrix[0] = 1.0f;
+    m_projectionMatrix[5] = 1.0f;
+    m_projectionMatrix[10] = 1.0f;
+    m_projectionMatrix[15] = 1.0f;
+}
 
 FireRenderer::~FireRenderer()
 {
@@ -39,7 +55,7 @@ bool FireRenderer::initialize()
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     vec3 origin = { 0.00f, 0.00f, 0.00f };
-    size_t nbParticles = 10;
+    size_t nbParticles = 100000;
     m_particleCount = static_cast<int>(nbParticles);
     Particle particles[nbParticles];
     for (size_t i = 0; i < nbParticles; i++)
@@ -95,11 +111,26 @@ bool FireRenderer::initialize()
     return true;
 }
 
+void FireRenderer::setCameraMatrices(const float* viewMatrix,
+                                     const float* projectionMatrix)
+{
+    for (int i = 0; i < 16; ++i)
+    {
+        m_viewMatrix[i] = viewMatrix[i];
+        m_projectionMatrix[i] = projectionMatrix[i];
+    }
+}
+
 void FireRenderer::render(float timeSeconds) const
 {
     glUseProgram(m_program);
     int timeLoc = glGetUniformLocation(m_program, "uTime");
     glUniform1f(timeLoc, timeSeconds);
+
+    const int viewLoc = glGetUniformLocation(m_program, "uView");
+    const int projectionLoc = glGetUniformLocation(m_program, "uProjection");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, m_viewMatrix);
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, m_projectionMatrix);
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_particleCount);
