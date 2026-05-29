@@ -14,7 +14,6 @@ public:
 	void keyUp(unsigned char key);
 	void specialDown(int key);
 	void specialUp(int key);
-	void mouseMove(int x, int y);
 	void reshape(int width, int height);
 
 	const float* viewMatrix() const;
@@ -36,12 +35,8 @@ private:
 	float m_yaw;
 	float m_pitch;
 	float m_moveSpeed;
-	float m_mouseSensitivity;
 	int m_width;
 	int m_height;
-	int m_lastMouseX;
-	int m_lastMouseY;
-	bool m_firstMouse;
 	bool m_keys[256];
 	bool m_specialKeys[256];
 	float m_view[16];

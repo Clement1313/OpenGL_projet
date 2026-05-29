@@ -24,12 +24,8 @@ Controller::Controller()
 	, m_yaw(-90.0f)
 	, m_pitch(0.0f)
 	, m_moveSpeed(3.0f)
-	, m_mouseSensitivity(0.12f)
 	, m_width(800)
 	, m_height(600)
-	, m_lastMouseX(0)
-	, m_lastMouseY(0)
-	, m_firstMouse(true)
 {
 	for (bool& key : m_keys)
 	{
@@ -49,7 +45,6 @@ void Controller::initialize(int width, int height)
 {
 	m_width = std::max(1, width);
 	m_height = std::max(1, height);
-	m_firstMouse = true;
 	updateProjectionMatrix();
 	updateViewMatrix();
 }
@@ -136,29 +131,6 @@ void Controller::specialUp(int key)
 	}
 }
 
-void Controller::mouseMove(int x, int y)
-{
-	if (m_firstMouse)
-	{
-		m_lastMouseX = x;
-		m_lastMouseY = y;
-		m_firstMouse = false;
-		return;
-	}
-
-	const float xOffset = static_cast<float>(x - m_lastMouseX);
-	const float yOffset = static_cast<float>(m_lastMouseY - y);
-
-	m_lastMouseX = x;
-	m_lastMouseY = y;
-
-	m_yaw += xOffset * m_mouseSensitivity;
-	m_pitch += yOffset * m_mouseSensitivity;
-
-	m_pitch = std::clamp(m_pitch, -89.0f, 89.0f);
-
-	updateViewMatrix();
-}
 
 void Controller::reshape(int width, int height)
 {
