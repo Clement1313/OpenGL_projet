@@ -11,10 +11,11 @@ find_package(GLUT REQUIRED)
 add_executable(OpenGLTriangle
     main.cc
     src/App.cc
+    src/Controller.cc
     src/FireRenderer.cc
 )
 
-target_include_directories(OpenGLTriangle PRIVATE include)
+target_include_directories(OpenGLTriangle PRIVATE include src)
 
 target_link_libraries(OpenGLTriangle PRIVATE
     OpenGL::GL

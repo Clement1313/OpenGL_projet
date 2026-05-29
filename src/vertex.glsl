@@ -1,6 +1,8 @@
 #version 430 core
 
 uniform float uTime;
+uniform mat4 uView;
+uniform mat4 uProjection;
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 velocity;
@@ -25,7 +27,7 @@ void main() {
     float age = mod(uTime + lifetime, max(maxlife, 1e-4));
     float lifeRatio = 1.0 - (age / max(maxlife, 1e-4));
     vec3 newPosition = position + velocity * age;
-    gl_Position = vec4(newPosition, 1.0);
+    gl_Position = uProjection * uView * vec4(newPosition, 1.0);
     gl_PointSize = max(1.0, size * lifeRatio * 80.0);
     vertexColor = color;
     vertexSize = size * lifeRatio;

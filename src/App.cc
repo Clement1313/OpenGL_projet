@@ -10,6 +10,7 @@ App::App(int argc, char** argv)
     : m_argc(argc)
     , m_argv(argv)
     , m_windowId(0)
+    , m_lastFrameTime(0)
 {
     s_instance = this;
 }
@@ -40,6 +41,9 @@ bool App::initialize()
 
     glViewport(0, 0, 800, 600);
 
+    m_controller.initialize(800, 600);
+    m_lastFrameTime = glutGet(GLUT_ELAPSED_TIME);
+
     if (!m_renderer.initialize())
     {
         std::cerr << "Renderer initialization failed." << std::endl;
@@ -49,6 +53,11 @@ bool App::initialize()
     glutDisplayFunc(displayCallback);
     glutReshapeFunc(reshapeCallback);
     glutCloseFunc(closeCallback);
+    glutKeyboardFunc(keyboardDownCallback);
+    glutKeyboardUpFunc(keyboardUpCallback);
+    glutSpecialFunc(specialDownCallback);
+    glutSpecialUpFunc(specialUpCallback);
+    glutIdleFunc(idleCallback);
 
     return true;
 }
@@ -82,8 +91,56 @@ void App::closeCallback()
     }
 }
 
+void App::keyboardDownCallback(unsigned char key, int x, int y)
+{
+    if (s_instance != nullptr)
+    {
+        s_instance->keyboardDown(key, x, y);
+    }
+}
+
+void App::keyboardUpCallback(unsigned char key, int x, int y)
+{
+    if (s_instance != nullptr)
+    {
+        s_instance->keyboardUp(key, x, y);
+    }
+}
+
+void App::specialDownCallback(int key, int x, int y)
+{
+    if (s_instance != nullptr)
+    {
+        s_instance->specialDown(key, x, y);
+    }
+}
+
+void App::specialUpCallback(int key, int x, int y)
+{
+    if (s_instance != nullptr)
+    {
+        s_instance->specialUp(key, x, y);
+    }
+}
+
+void App::idleCallback()
+{
+    if (s_instance != nullptr)
+    {
+        s_instance->idle();
+    }
+}
+
 void App::display()
 {
+    const int currentTime = glutGet(GLUT_ELAPSED_TIME);
+    const float deltaSeconds = static_cast<float>(currentTime - m_lastFrameTime) / 1000.0f;
+    m_lastFrameTime = currentTime;
+
+    m_controller.update(deltaSeconds);
+    m_renderer.setCameraMatrices(m_controller.viewMatrix(),
+                                 m_controller.projectionMatrix());
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -102,4 +159,29 @@ void App::reshape(int width, int height) const
 void App::cleanup()
 {
     m_renderer.cleanup();
+}
+
+void App::keyboardDown(unsigned char key, int, int)
+{
+    m_controller.keyDown(key);
+}
+
+void App::keyboardUp(unsigned char key, int, int)
+{
+    m_controller.keyUp(key);
+}
+
+void App::specialDown(int key, int, int)
+{
+    m_controller.specialDown(key);
+}
+
+void App::specialUp(int key, int, int)
+{
+    m_controller.specialUp(key);
+}
+
+void App::idle()
+{
+    glutPostRedisplay();
 }
