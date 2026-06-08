@@ -13,6 +13,8 @@ add_executable(OpenGLTriangle
     src/App.cc
     src/Controller.cc
     src/FireRenderer.cc
+        src/TorchRenderer.cc
+        src/TorchRenderer.cc
 )
 
 target_include_directories(OpenGLTriangle PRIVATE include src)

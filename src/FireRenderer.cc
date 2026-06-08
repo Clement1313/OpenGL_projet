@@ -1,6 +1,10 @@
+#define _USE_MATH_DeFINES
 #include "FireRenderer.hh"
 
+#include "../include/Vec.hh"
+
 #include <GL/glew.h>
+#include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
@@ -54,13 +58,13 @@ bool FireRenderer::initialize()
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    vec3 origin = { 0.00f, 0.00f, 0.00f };
+
     size_t nbParticles = 100000;
     m_particleCount = static_cast<int>(nbParticles);
     Particle particles[nbParticles];
     for (size_t i = 0; i < nbParticles; i++)
     {
-        particles[i] = genParticle(origin);
+        particles[i] = genParticle(m_origin);
     }
 
     glGenVertexArrays(1, &m_vao);
@@ -238,12 +242,32 @@ float FireRenderer::random(float maxVal) const
     return static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / maxVal));
 }
 
+
 Particle FireRenderer::genParticle(const vec3 origin) const
 {
-    vec3 pos = { origin.x + random(0.4f) - 0.2f, origin.y + random(0.05f),
-                 origin.z };
-    vec3 vel = { 0.f, 0.3f + random(0.2f), 0.f };
-    vec4 col = { 1.00f - random(0.2f), random(0.30f), 0.0f + random(0.2f),
+    // Logic de disque de Reeves:Particle Systemsm A Technique for Modeling a Class of Fuzzy Objects
+    float rayon_base = 0.4f;
+    float rayon = rayon_base * std::sqrt(random(1));
+    float theta = random(2 * M_PI) ;
+    vec3 pos = { origin.x + rayon * std::cos(theta), origin.y + random(0.05f),
+                 origin.z +  rayon * std::sin(theta)};
+
+    float max_ejection_angle = 0.1f;
+    float angle_ejection = random(max_ejection_angle);
+    float angle_phi = random(2 * M_PI);
+
+    vec3 direction  = {std::sin(angle_ejection) * std::cos(angle_phi), std::cos(angle_ejection), std::sin(angle_ejection)* std::sin(angle_phi)};
+
+    // Logic de Reeves pour la vitesse:
+    // speed = MeanSpeed + random() (varie de 1 à -1) * VarSpeed
+    float mean_speed = 0.8f;
+    float var_speed = 0.3f;
+    float speed = mean_speed + (random(2.f) - 1.f) * var_speed;
+
+
+    vec3 vel = { direction.x * speed, direction.y * speed, direction.z * speed };
+
+    vec4 col = { 1.00f - random(0.2f), random(0.30f), random(0.2f),
                  1.00f };
     Particle res = { pos, vel, random(1.0f), 1.0f, col, 0.15f };
     return res;

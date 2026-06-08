@@ -1,4 +1,4 @@
-#include "Controller.hh"
+#include "../include/Controller.hh"
 
 #include <algorithm>
 #include <cmath>

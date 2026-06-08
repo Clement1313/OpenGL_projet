@@ -1,16 +1,28 @@
 #include "App.hh"
 
+#include "../include/TorchRenderer.hh"
+#include "TorchRenderer.hh"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
 #include <iostream>
 
-App* App::s_instance = nullptr;
+#include <vector>
+
+App * App::s_instance = nullptr;
 
 App::App(int argc, char** argv)
     : m_argc(argc)
     , m_argv(argv)
     , m_windowId(0)
     , m_lastFrameTime(0)
+    , m_renderer(
+        Vector3{0.0f, -1.0f, 0.0f},
+        2.0f,0.1f,std::vector<Vector3>{
+        Vector3{0.0f, -1.0f, 0.0f},
+        Vector3{0.0f, 1.0f, 0.0f},
+
+        }, 16)
 {
     s_instance = this;
 }
@@ -139,9 +151,9 @@ void App::display()
 
     m_controller.update(deltaSeconds);
     m_renderer.setCameraMatrices(m_controller.viewMatrix(),
-                                 m_controller.projectionMatrix());
+                                 m_controller.projectionMatrix(),m_controller.cameraPosition());
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.05f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     float timeSeconds = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;

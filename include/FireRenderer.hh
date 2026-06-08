@@ -25,8 +25,11 @@ public:
     void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix);
     void render(float timeSeconds) const;
     void cleanup();
-
+    void setOrigin(vec3 origin) {
+        m_origin = origin;
+    }
 private:
+    vec3 m_origin;
     unsigned int m_vao;
     unsigned int m_vbo;
     unsigned int m_program;

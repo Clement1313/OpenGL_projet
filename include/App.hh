@@ -2,7 +2,7 @@
 #define APP_H
 
 #include "Controller.hh"
-#include "FireRenderer.hh"
+#include "TorchRenderer.hh"
 
 class App {
 public:
@@ -19,7 +19,7 @@ private:
     int m_windowId;
     int m_lastFrameTime;
     Controller m_controller;
-    FireRenderer m_renderer;
+    TorchRenderer m_renderer;
 
     static void displayCallback();
     static void reshapeCallback(int width, int height);
