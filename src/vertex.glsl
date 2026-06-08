@@ -27,11 +27,7 @@ void main() {
 
     float age = mod(uTime + lifetime, max(maxlife, 1e-4));
     float lifeRatio = 1.0 - (age / max(maxlife, 1e-4));
-    vec3 newPosition = velocity * age * 0.5;
-    float toCenter = pow(lifeRatio, 0.7);
-    newPosition.x *= toCenter;
-    newPosition.z *= toCenter;
-    newPosition += position;
+    vec3 newPosition =  position + velocity * age * 0.5;
     gl_Position = uProjection * uView * vec4(newPosition, 1.0);
     gl_PointSize = max(1.0, size * lifeRatio * 80.0);
     vertexColor = color;

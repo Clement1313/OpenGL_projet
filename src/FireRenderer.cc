@@ -246,9 +246,10 @@ float FireRenderer::random(float maxVal) const
 Particle FireRenderer::genParticle(const vec3 origin) const
 {
     // Logic de disque de Reeves:Particle Systemsm A Technique for Modeling a Class of Fuzzy Objects
-    float rayon_base = 0.4f;
-    float rayon = rayon_base * std::sqrt(random(1));
+    // float rayon_base = 0.4f;
+    float rayon = random(m_rayonBase);// rayon_base * std::sqrt(random(1));
     float theta = random(2 * M_PI) ;
+
     vec3 pos = { origin.x + rayon * std::cos(theta), origin.y + random(0.05f),
                  origin.z +  rayon * std::sin(theta)};
 

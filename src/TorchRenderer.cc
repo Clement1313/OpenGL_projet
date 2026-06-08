@@ -445,6 +445,7 @@ bool TorchRenderer::initialize() {
 
   m_indice_count = indices.size() * 3;
   m_indice_count_bout_ = indices_bout.size() * 3;
+  fire_renderer_.setRayonBase(m_rayon_manche_ * 1.5f );
   return  fire_renderer_.initialize();
 }
 

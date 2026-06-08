@@ -28,6 +28,9 @@ public:
     void setOrigin(vec3 origin) {
         m_origin = origin;
     }
+    void setRayonBase(float rayonBase) {
+        m_rayonBase = rayonBase;
+    }
 private:
     vec3 m_origin;
     unsigned int m_vao;
@@ -36,6 +39,7 @@ private:
     int m_particleCount;
     float m_viewMatrix[16];
     float m_projectionMatrix[16];
+    float m_rayonBase = 0.0f;
 
     unsigned int compileShader(unsigned int type, const char* source) const;
     unsigned int createProgram(const char* vertexSource,
