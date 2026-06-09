@@ -15,8 +15,7 @@ void main()
 {
     // utilisation de phong: ambiant + diffuse + specular
     
-    // fbm avec des sinus (pour variation des couleurs)   
-    // float fbm = sin(uTime)  + 0.5 * sin(uTime * 2) + 0.25 * sin(uTime * 4);
+
     vec3 lightColor = vec3(1.0, 1.0, 1.0) * (uLightIntensity);
     
     // Attenuation de la lumière selon Ogre Wiki
@@ -27,7 +26,7 @@ void main()
     float attenuation = 1.0 / (k_constant + k_linear * distance + k_quadratic * (distance * distance));
     
     // ambiant
-    float ambiantValue = 0.1;
+    float ambiantValue = 0.2;
     vec3 ambiant = ambiantValue * uMaterialColor * attenuation;  
     
     // diffus

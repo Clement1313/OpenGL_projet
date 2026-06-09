@@ -90,9 +90,11 @@ unsigned int TorchRenderer::createProgram(const char* vertexSource,
 
 
 
-TorchRenderer::TorchRenderer(Vector3 position, float hauteur_manche,float rayon_manche,std::vector<Vector3> chemin, size_t numberPrisme): m_position_(position),
+TorchRenderer::TorchRenderer(Vector3 position, float hauteur_manche,float rayon_manche,float rayon_bout_,float hauteur_bout_,std::vector<Vector3> chemin,size_t numberPrisme): m_position_(position),
 m_hauteur_manche_(hauteur_manche), m_rayon_manche_(rayon_manche),chemin_(chemin),m_numberPrisme_(numberPrisme),m_intensite_fire_(1.0f) {
   m_hauteur_bout_ = hauteur_manche;
+  m_rayon_bout_ = rayon_bout_;
+  m_hauteur_bout_ = hauteur_bout_;
   for (int i = 0; i < 16; ++i)
   {
     m_viewMatrix[i] = 0.0f;
@@ -128,7 +130,8 @@ void TorchRenderer::getVertex(std::vector<Vector3>& BeforeCirclePoint, Plan& act
     actualDroite.point = BeforeCirclePoint[j];
     v.position = intersectionPlanDroite(actualPlan,actualDroite);
     BeforeCirclePoint[j] = v.position;
-    v.normal = normalize(v.position);  // à revoir pour correction
+    v.normal = sub(v.normal,actualDroite.point);
+    v.normal = normalize(v.normal);  // à revoir pour correction
     v.uv.x = ((float)j)/((float)sizeCircle);
     v.uv.y = verticalTextCoord;
     vertex.push_back(v);
@@ -391,7 +394,7 @@ bool TorchRenderer::initialize() {
 
   m_indice_count = indices.size() * 3;
   m_indice_count_bout_ = indices_bout.size() * 3;
-  fire_renderer_.setRayonBase(m_rayon_manche_ * 1.5f );
+  fire_renderer_.setRayonBase(m_rayon_bout_ );
   return  fire_renderer_.initialize();
 }
 
@@ -487,8 +490,13 @@ void TorchRenderer::setCameraMatrices(const float *viewMatrix,
   fire_renderer_.setCameraMatrices(viewMatrix,projectionMatrix);
 }
 
-void TorchRenderer::updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout) {
+void TorchRenderer::updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout,float * color) {
   chemin_ = newChemin;
+  m_materialColor[0] = color[0];
+  m_materialColor[1] = color[1];
+  m_materialColor[2] = color[2];
+  Vector3 new_Vector3 = {chemin_.back().x, chemin_.back().y + 0.2f, chemin_.back().z};
+  chemin_.push_back(new_Vector3);
   m_rayon_manche_ = rayon_manche;
   m_rayon_bout_ = rayon_bout;
   m_hauteur_bout_ = hauteur_bout;
@@ -502,6 +510,8 @@ void TorchRenderer::updateChemin(std::vector<Vector3>& newChemin,float rayon_man
   genBout(vertex_bout,indices_bout);
   m_indice_count_bout_ = indices_bout.size() * 3;
 
+  const int materialColorLoc = glGetUniformLocation(m_program, "uMaterialColor");
+  glUniform3fv(materialColorLoc,1,m_materialColor);
 
   glBindBuffer(GL_ARRAY_BUFFER, m_vbo_manche_);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertex.size(), vertex.data(), GL_DYNAMIC_DRAW);
@@ -515,7 +525,7 @@ void TorchRenderer::updateChemin(std::vector<Vector3>& newChemin,float rayon_man
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo_bout_);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_bout.size() * sizeof(TriangleIndices), indices_bout.data(), GL_DYNAMIC_DRAW);
 
-  vec3 originFire = {newChemin.back().x, newChemin.back().y + m_hauteur_bout_, newChemin.back().z};
+  vec3 originFire = {newChemin.back().x, newChemin.back().y + m_hauteur_bout_ + 0.2f, newChemin.back().z};
   fire_renderer_.setOrigin(originFire);
   fire_renderer_.setRayonBase(m_rayon_bout_);
   fire_renderer_.update();

@@ -28,6 +28,8 @@ private:
     float m_rayonManche = 0.089f;
     float m_rayonBout = 0.3f;
     float m_hauteurBout = 0.5f;
+    float m_materialColor[3] = {0.3f,0.2f,0.5f};
+
     static void displayCallback();
     static void reshapeCallback(int width, int height);
     static void closeCallback();

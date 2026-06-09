@@ -22,8 +22,9 @@ App::App(int argc, char** argv)
     , m_lastFrameTime(0)
     , m_renderer(
         Vector3{0.0f, -1.0f, 0.0f},
-        2.0f,0.1f,std::vector<Vector3> {Vector3{0.0f, -1.0f, 0.0f},
-       Vector3{0.0f, 1.0f, 0.0f}}, 16)
+        2.0f,0.089f,0.3f,0.5f,std::vector<Vector3> {Vector3{0.0f, -1.0f, 0.0f},
+       Vector3{0.0f, 1.0f, 0.0f},
+        Vector3{0.f,1.2f,0.0f}}, 16)
 {
     s_instance = this;
 }
@@ -215,7 +216,7 @@ void App::display()
     ImGui::Text("Hauteur");
     ImGui::PushID("En-tête-Hauteur");
     ImGui::SameLine();
-    changement = changement ||ImGui::SliderFloat("##float",&m_hauteurBout,0.01f,2s.f);
+    changement = changement ||ImGui::SliderFloat("##float",&m_hauteurBout,0.01f,2.f);
     ImGui::PopID();
 
     ImGui::Separator();
@@ -226,11 +227,22 @@ void App::display()
     ImGui::SameLine();
     changement = changement ||ImGui::SliderFloat("##float",&m_rayonManche,0.01f,1.f);
     ImGui::PopID();
+
+    ImGui::Separator();
+    ImGui::Text("Couleur Torche");
+    ImGui::Separator();
+    ImGui::PushID("Couleur-Torche");
+    ImGui::Text("Couleur::");
+    ImGui::SameLine();
+    changement = changement ||ImGui::ColorEdit3("couleur",m_materialColor);
+    ImGui::PopID();
+
+
     ImGui::End();
     ImGui::Render();
 
     if (changement) {
-        m_renderer.updateChemin(m_chemin,m_rayonManche,m_rayonBout,m_hauteurBout);
+        m_renderer.updateChemin(m_chemin,m_rayonManche,m_rayonBout,m_hauteurBout,m_materialColor);
         changement = false;
     }
 

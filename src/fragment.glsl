@@ -15,7 +15,8 @@ void main() {
     
     float t = clamp(vertexLife / max(vertexMaxLife, 1e-6), 0.0, 1.0);
     float alpha = 1.0 - t;
-    
+	
+
     float falloff = smoothstep(0.5, 0.0, dist);
     
     vec3 color = vertexColor.rgb;

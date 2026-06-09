@@ -80,11 +80,11 @@ struct TriangleIndices {unsigned int x, y, z; };
 
 class TorchRenderer {
 public:
-  TorchRenderer(Vector3 position, float hauteur_manche,float rayon_manche,std::vector<Vector3> chemin,size_t numberPrisme = 30);
+  TorchRenderer(Vector3 position, float hauteur_manche,float rayon_manche,float rayon_bout_,float hauteur_bout_,std::vector<Vector3> chemin,size_t numberPrisme = 30);
   bool initialize();
   void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix, const float * cameraPosition);
   void render(float timeSeconds) const;
-  void updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout);
+  void updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout,float* color);
   void cleanup();
 private:
   void genBout();
