@@ -20,7 +20,10 @@ private:
     int m_lastFrameTime;
     Controller m_controller;
     TorchRenderer m_renderer;
-
+    std::vector<Vector3> m_chemin  {
+        Vector3{0.0f, -1.0f, 0.0f},
+       Vector3{0.0f, 1.0f, 0.0f}
+    };
     static void displayCallback();
     static void reshapeCallback(int width, int height);
     static void closeCallback();

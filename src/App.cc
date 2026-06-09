@@ -9,6 +9,10 @@
 
 #include <vector>
 
+#include "../external/imgui/imgui.h"
+#include "imgui.h"
+#include "imgui_impl_glut.h"
+#include "imgui_impl_opengl3.h"
 App * App::s_instance = nullptr;
 
 App::App(int argc, char** argv)
@@ -18,11 +22,8 @@ App::App(int argc, char** argv)
     , m_lastFrameTime(0)
     , m_renderer(
         Vector3{0.0f, -1.0f, 0.0f},
-        2.0f,0.1f,std::vector<Vector3>{
-        Vector3{0.0f, -1.0f, 0.0f},
-        Vector3{0.0f, 1.0f, 0.0f},
-
-        }, 16)
+        2.0f,0.1f,std::vector<Vector3> {Vector3{0.0f, -1.0f, 0.0f},
+       Vector3{0.0f, 1.0f, 0.0f}}, 16)
 {
     s_instance = this;
 }
@@ -51,6 +52,16 @@ bool App::initialize()
         return false;
     }
 
+
+    //UI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplGLUT_Init();
+    glutMouseFunc(ImGui_ImplGLUT_MouseFunc);
+    glutMotionFunc(ImGui_ImplGLUT_MotionFunc);
+    ImGui_ImplOpenGL3_Init("#version 430");
+
     glViewport(0, 0, 800, 600);
 
     m_controller.initialize(800, 600);
@@ -71,6 +82,7 @@ bool App::initialize()
     glutSpecialUpFunc(specialUpCallback);
     glutIdleFunc(idleCallback);
 
+    // ImGui_ImplGLUT_InstallFuncs();
     return true;
 }
 
@@ -145,6 +157,7 @@ void App::idleCallback()
 
 void App::display()
 {
+
     const int currentTime = glutGet(GLUT_ELAPSED_TIME);
     const float deltaSeconds = static_cast<float>(currentTime - m_lastFrameTime) / 1000.0f;
     m_lastFrameTime = currentTime;
@@ -157,7 +170,48 @@ void App::display()
     glClear(GL_COLOR_BUFFER_BIT);
 
     float timeSeconds = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGLUT_NewFrame();
+
+    bool changement=false;
+    int toErase = -1;
+    ImGui::NewFrame();
+    ImGui::Begin("Paramètre Torche");
+    ImGui::Text("Point de Génération de la Torche");
+    ImGui::Separator();
+    for (int i = 0; i < m_chemin.size(); i++) {
+        ImGui::PushID(i);
+        ImGui::Text("Point %d", i);
+        ImGui::SameLine();
+        changement  = changement ||ImGui::SliderFloat3("Coordonée",&m_chemin[i].x,-15.0f,15.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("X") && m_chemin.size() > 2) {
+            toErase = i;
+            changement = true;
+        }
+        ImGui::PopID();
+    }
+    if (toErase != -1) {
+        m_chemin.erase(m_chemin.begin() + toErase);
+    }
+    if (ImGui::Button("Ajouter Point")) {
+            Vector3 newPoint = {m_chemin.back().x, m_chemin.back().y + 1.f, m_chemin.back().z};
+            m_chemin.push_back(newPoint);
+            changement = true;
+    }
+
+    ImGui::End();
+    ImGui::Render();
+
+    if (changement) {
+        m_renderer.updateChemin(m_chemin);
+        changement = false;
+    }
+
     m_renderer.render(timeSeconds);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glutSwapBuffers();
     glutPostRedisplay();
@@ -166,11 +220,19 @@ void App::display()
 void App::reshape(int width, int height) const
 {
     glViewport(0, 0, width, height);
+    if (ImGui::GetCurrentContext() != nullptr) {
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize = ImVec2(static_cast<float>(width), static_cast<float>(height));
+    }
 }
 
 void App::cleanup()
 {
     m_renderer.cleanup();
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGLUT_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void App::keyboardDown(unsigned char key, int, int)

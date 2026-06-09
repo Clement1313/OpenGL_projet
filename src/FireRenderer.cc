@@ -39,6 +39,22 @@ FireRenderer::~FireRenderer()
     cleanup();
 }
 
+
+void FireRenderer::update() {
+    size_t nbParticles = 100000;
+    m_particleCount = static_cast<int>(nbParticles);
+    Particle particles[nbParticles];
+    for (size_t i = 0; i < nbParticles; i++)
+    {
+        particles[i] = genParticle(m_origin);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_DYNAMIC_DRAW);
+    glBindVertexArray(0);
+
+
+}
 bool FireRenderer::initialize()
 {
     const string vertexCode = loadShader("src/vertex.glsl");

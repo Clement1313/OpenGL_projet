@@ -121,97 +121,21 @@ void genCircle(std::vector<Vector3>& circlePoint,size_t count) {
 }
 
 
-void TorchRenderer::getVertex(const std::vector<Vector3>& circlePoint,float rayon, Vector3 origin, Vector3 direction, Vector3 normal, std::vector<Vertex>& vertex,float verticalTextCoord) {
-
-  size_t sizeCircle = circlePoint.size();
-  Vector3 direction_normal = normalize(direction);
-  Vector3 normal_normalized = normalize(normal);
-
-  Vector3 start_up = {0.f,1.f,0.f};
-  if (std::abs(dot(direction_normal,start_up)) >= 0.99f) {
-    start_up = {1.f,0.f,0.f};
-  }
-  Vector3 right = normalize(cross(direction_normal,start_up));
-  Vector3 up =normalize(cross(right,direction_normal));
-
-
-  float inclinaison = dot(direction_normal,normal_normalized);
-  for (int j = 0; j < sizeCircle; j++) {
+void TorchRenderer::getVertex(std::vector<Vector3>& BeforeCirclePoint, Plan& actualPlan, Droite& actualDroite, std::vector<Vertex>& vertex,float verticalTextCoord) {
+  size_t sizeCircle = BeforeCirclePoint.size();
+  for (unsigned int j = 0; j < sizeCircle; j++) {
     Vertex v;
-    Vector3 point = {circlePoint[j].x * rayon, 0.0f,circlePoint[j].z * rayon};
-    float t = 0.0f;
-    Vector3 point_position = {right.x * point.x + up.x * point.z,right.y * point.x + up.y *point.z,right.z * point.x + up.z * point.z};
-
-    if (std::abs(inclinaison) > 1e-5f) {
-      // Vector3 vecteur_origin_point = sub(origin,point);
-      t = - dot(normal_normalized,point_position);
-      t /= inclinaison;
-
-    }
-    Vector3 vecteur_projection = multiply(direction_normal,t);
-
-
-    /*Vector3 point_projete = add(point,vecteur_projection); // projection du points sur le plan
-    Vector3 direction_projete_origin = sub(point_projete,origin);
-    direction_projete_origin = normalize(direction_projete_origin);
-
-    direction_projete_origin = multiply(direction_projete_origin,rayon);
-*/
-    v.position = add(origin,point_position);
-    v.position = add(v.position,vecteur_projection);
-    Vector3 center = add(origin,vecteur_projection);
-    Vector3 normal_du_plan = sub(v.position,center);
-    v.normal = normalize(normal_du_plan);
+    actualDroite.point = BeforeCirclePoint[j];
+    v.position = intersectionPlanDroite(actualPlan,actualDroite);
+    BeforeCirclePoint[j] = v.position;
+    v.normal = normalize(v.position);  // à revoir pour correction
     v.uv.x = ((float)j)/((float)sizeCircle);
     v.uv.y = verticalTextCoord;
-
     vertex.push_back(v);
 
   }
 
 }
-
-/*
-void TorchRenderer::getVertex(const std::vector<Vector3>& circlePoint,float rayon, Vector3 origin, Vector3 direction, Vector3 normal, std::vector<Vertex>& vertex,float verticalTextCoord) {
-  size_t sizeCircle = circlePoint.size();
-
-  Vector3 start_up = {0.f,1.f,0.f};
-  Vector3 right = normalize(cross(direction,start_up));
-  Vector3 up =normalize(cross(right,direction));
-
-  for (int j = 0; j < sizeCircle; j++) {
-    Vertex v;
-    Vector3 point  = {circlePoint[j].x  * rayon, 0.0f,circlePoint[j].z * rayon};
-
-    v.position = {
-    origin.x + right.x * point.x * rayon + up.x * point.z * rayon,
-      origin.y + right.y * point.x * rayon + up.y * point.z * rayon,
-      origin.z + right.z * point.x * rayon + up.z * point.z * rayon
-    };
-    v.normal = {right.x * point.x + up.x * point.z,right.y * point.x + up.y *point.z,right.z * point.x + up.z * point.z};
-    v.normal = normalize(v.normal);
-    /*
-    float intersection = dot(normal, direction);
-    float t = 0.0f;
-    if (std::abs(intersection) > 1e-5f) {
-      Vector3 vecteur_origin_point = sub(origin,point);
-      t = dot(normal,vecteur_origin_point);
-      t /= intersection;
-    }
-    Vector3 vecteur_projection = multiply(direction,t);
-
-    Vector3 point_projete = add(point,vecteur_projection); // projection du points sur le plan
-
-    v.position = point_projete;
-    Vector3 normal_du_plan = sub(point_projete,origin);
-    v.normal = normalize(normal_du_plan);
-    v.uv.x = ((float)j)/((float)sizeCircle);
-    v.uv.y = verticalTextCoord;
-    vertex.push_back(v);
-  }
-}
-
-*/
 
 /*
 void genVertex(std::vector<Vector3>& circlePoint,float rayon, float hauteur, Vector3& origin,std::vector<Vertex>& vertex) {
@@ -231,10 +155,7 @@ void getVertexBout(std::vector<Vector3>& circlePoint,float rayon, float hauteur,
     v.normal.x =circlePoint[j].x;
     v.normal.y = pente;
     v.normal.z =circlePoint[j].z;
-    float longueur = std::sqrt(v.normal.x*v.normal.x + v.normal.y * v.normal.y + v.normal.z * v.normal.z);
-    v.normal.x /= longueur;
-    v.normal.y /= longueur;
-    v.normal.z /= longueur;
+    v.normal = normalize(v.normal);
     v.uv.x = ((float)j)/((float)sizeCircle);
     v.uv.y = verticalTextCoord;
     vertex.push_back(v);
@@ -306,35 +227,60 @@ void genIndiceDisque(unsigned int  index,size_t numberPrisme,bool high,std::vect
   }
 }
 
-
+void generateFirstCircle(std::vector<Vector3>&  circlePoint,float rayon,Vector3& origin) {
+  for (unsigned int i = 0; i < circlePoint.size(); i++) {
+    circlePoint[i].x = circlePoint[i].x * rayon  + origin.x;
+    circlePoint[i].y = origin.y;
+    circlePoint[i].z = circlePoint[i].z * rayon  + origin.z;
+  }
+}
 void TorchRenderer::genManche(std::vector<Vertex>& vertex, std::vector<TriangleIndices>& indices) {
   if (chemin_.size() < 2) {
     return;
   }
-
+  // cas pour le premier point (chemin_[0])
   std::vector<Vector3> circlePoint;
   genCircle(circlePoint,m_numberPrisme_);
 
-  Vector3 direction = normalize(sub(chemin_[1], chemin_[0]));
-  getVertex(circlePoint,m_rayon_manche_,chemin_[0],direction,direction,vertex,0.0f);
 
+
+  // cas pour les autres points
   size_t len = chemin_.size();
-  for (size_t i = 1; i < len; i++) {
-    Vector3 distance1 = sub(chemin_[i], chemin_[i -1]);
-    Vector3 distance2;
-    if (i == len - 1) {
-      distance2 = sub(chemin_[i], chemin_[i -  1]);
+  for (size_t i = 0; i < len; i++) {
+    Vector3 before;
+    Vector3 after;
+    Vector3 actual = chemin_[i];
+    if (!i) {
+      before = {chemin_[0].x,chemin_[0].y - 1.f,chemin_[0].z};
+      after = chemin_[1];
+      generateFirstCircle(circlePoint,m_rayon_manche_,before);
+    }
+    else if (i == len - 1) {
+      before = chemin_[i - 1];
+      after = chemin_[i - 1];
     }
     else {
-      distance2 = sub(chemin_[i + 1], chemin_[i]);
+      before = chemin_[i - 1];
+      after = chemin_[i + 1];
     }
-    Vector3 normal= add(distance1,distance2);
-    normal = normalize(normal);
+    Vector3 v1 = sub(actual,before);
+    Vector3 v2 = sub(after,actual);
+    if (i ==len - 1) {
+      v2 = v1;
+    }
+    v1 = normalize(v1);
+    v2 = normalize(v2);
+
+    Vector3 n = add(v1,v2);
+    n  = normalize(n);
+    Plan pointCheminPlan{n,-dot(n,actual)};
+    Droite droite {v1,{0,0,0}};
     float UV_coord = (float) i / (float) (len - 1);
-    getVertex(circlePoint,m_rayon_manche_,chemin_[i],distance1,normal,vertex,UV_coord);
+    getVertex(circlePoint, pointCheminPlan,droite,vertex,UV_coord);
   }
-   genIndices(chemin_.size(),m_numberPrisme_,indices);
+  genIndices(chemin_.size(),m_numberPrisme_,indices);
 }
+
 
 void TorchRenderer::genBout(std::vector<Vertex>& vertex,std::vector<TriangleIndices>& indices) {
   if (chemin_.empty()) {
@@ -539,4 +485,35 @@ void TorchRenderer::setCameraMatrices(const float *viewMatrix,
   m_cameraPosition_[1] = cameraPosition[1];
   m_cameraPosition_[2] = cameraPosition[2];
   fire_renderer_.setCameraMatrices(viewMatrix,projectionMatrix);
+}
+
+void TorchRenderer::updateChemin(std::vector<Vector3> &newChemin) {
+  chemin_ = newChemin;
+  std::vector<Vertex> vertex;
+  std::vector<TriangleIndices> indices;
+  genManche(vertex,indices);
+  m_indice_count = indices.size() * 3;
+
+  std::vector<Vertex> vertex_bout;
+  std::vector<TriangleIndices> indices_bout;
+  genBout(vertex_bout,indices_bout);
+  m_indice_count_bout_ = indices_bout.size() * 3;
+
+
+  glBindBuffer(GL_ARRAY_BUFFER, m_vbo_manche_);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertex.size(), vertex.data(), GL_DYNAMIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo_manche_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(TriangleIndices), indices.data(), GL_DYNAMIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, m_vbo_bout_);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertex_bout.size(), vertex_bout.data(), GL_DYNAMIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo_bout_);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_bout.size() * sizeof(TriangleIndices), indices_bout.data(), GL_DYNAMIC_DRAW);
+
+  vec3 originFire = {newChemin.back().x, newChemin.back().y + m_hauteur_bout_, newChemin.back().z};
+  fire_renderer_.setOrigin(originFire);
+  fire_renderer_.update();
+  glBindVertexArray(0);
 }

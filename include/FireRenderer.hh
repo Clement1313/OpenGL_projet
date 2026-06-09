@@ -24,6 +24,7 @@ public:
     bool initialize();
     void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix);
     void render(float timeSeconds) const;
+    void update();
     void cleanup();
     void setOrigin(vec3 origin) {
         m_origin = origin;

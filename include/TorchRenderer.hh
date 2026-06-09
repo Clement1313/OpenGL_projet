@@ -15,6 +15,18 @@ struct Vertex {
   Vector3 normal;
   Vector2 uv;
 };
+struct Plan {
+  Vector3 normal;
+  float d;
+};
+struct Droite {
+  Vector3 v;
+  Vector3 point;
+};
+
+
+
+
 
 inline Vector3 sub(const Vector3& v1,const  Vector3& v2) {
   return {v1.x - v2.x,v1.y - v2.y,v1.z - v2.z};
@@ -45,6 +57,22 @@ inline float dot(const Vector3& v1, const Vector3& v2) {
   return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
+inline Vector3 intersectionPlanDroite(const Plan& plan,const Droite& droite) {
+  float alpha =0.f;
+
+  float produit_scalaireNormalDirection = dot(plan.normal,droite.v);
+  float produit_scalaireNormalPoint = dot(plan.normal,droite.point);
+  if (std::abs(produit_scalaireNormalDirection) < 0.0001f) {
+    return {0.0f,0.0f,0.0f}; // problème car la normale du plan et le vecteur directeur sont orthogonal
+  }
+  alpha = ((produit_scalaireNormalPoint + plan.d)/ produit_scalaireNormalDirection) * -1.0f;
+
+  Vector3 translation = multiply(droite.v,alpha);
+  return add(droite.point,translation);
+
+}
+
+
 struct TriangleIndices {unsigned int x, y, z; };
 
 
@@ -56,6 +84,7 @@ public:
   bool initialize();
   void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix, const float * cameraPosition);
   void render(float timeSeconds) const;
+  void updateChemin(std::vector<Vector3>& newChemin);
   void cleanup();
 private:
   void genBout();
@@ -66,7 +95,9 @@ private:
   FireRenderer fire_renderer_;
 
   unsigned int m_program;
-  void getVertex(const std::vector<Vector3>& circlePoint,float rayon, Vector3 origin, Vector3 distance, Vector3 normal_plan, std::vector<Vertex>& vertex,float verticalTextCoord);
+//  void getVertex(const std::vector<Vector3>& circlePoint,float rayon, Vector3 origin, Vector3 distance, Vector3 normal_plan, std::vector<Vertex>& vertex,float verticalTextCoord);
+//  void getVertex(const std::vector<Vector3>& circlePoint,float rayon,float hauteur, Vector3 origin, std::vector<Vertex>& vertex,float verticalTextCoord);
+  void getVertex(std::vector<Vector3>& BeforeCirclePoint, Plan& actualPlan, Droite& actualDroite, std::vector<Vertex>& vertex,float verticalTextCoord);
 
   void genManche(std::vector<Vertex>& vertex,
   std::vector<TriangleIndices>& indices);
