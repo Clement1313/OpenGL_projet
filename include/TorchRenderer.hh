@@ -84,7 +84,7 @@ public:
   bool initialize();
   void setCameraMatrices(const float* viewMatrix, const float* projectionMatrix, const float * cameraPosition);
   void render(float timeSeconds) const;
-  void updateChemin(std::vector<Vector3>& newChemin);
+  void updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout);
   void cleanup();
 private:
   void genBout();
@@ -120,6 +120,7 @@ std::vector<TriangleIndices>& indices);
   unsigned int m_vbo_bout_;
   unsigned int m_ebo_bout_;
   float m_hauteur_bout_;
+  float m_rayon_bout_;
   unsigned int m_indice_count_bout_;
 
 

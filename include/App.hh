@@ -24,6 +24,10 @@ private:
         Vector3{0.0f, -1.0f, 0.0f},
        Vector3{0.0f, 1.0f, 0.0f}
     };
+
+    float m_rayonManche = 0.089f;
+    float m_rayonBout = 0.3f;
+    float m_hauteurBout = 0.5f;
     static void displayCallback();
     static void reshapeCallback(int width, int height);
     static void closeCallback();

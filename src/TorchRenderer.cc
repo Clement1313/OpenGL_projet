@@ -92,7 +92,7 @@ unsigned int TorchRenderer::createProgram(const char* vertexSource,
 
 TorchRenderer::TorchRenderer(Vector3 position, float hauteur_manche,float rayon_manche,std::vector<Vector3> chemin, size_t numberPrisme): m_position_(position),
 m_hauteur_manche_(hauteur_manche), m_rayon_manche_(rayon_manche),chemin_(chemin),m_numberPrisme_(numberPrisme),m_intensite_fire_(1.0f) {
-  m_hauteur_bout_ = hauteur_manche * 0.4;
+  m_hauteur_bout_ = hauteur_manche;
   for (int i = 0; i < 16; ++i)
   {
     m_viewMatrix[i] = 0.0f;
@@ -291,7 +291,7 @@ void TorchRenderer::genBout(std::vector<Vertex>& vertex,std::vector<TriangleIndi
   genCircle(circlePoint,m_numberPrisme_);
 
   Vector3 boutStart = chemin_.back();
-  float rayon_haut = m_rayon_manche_ * 1.5f;
+  float rayon_haut = m_rayon_bout_;
   genVertexBout(circlePoint,boutStart,m_rayon_manche_,rayon_haut,m_hauteur_bout_,vertex);
   Vector3 element = {boutStart.x,boutStart.y + m_hauteur_bout_,boutStart.z};
   std::vector<Vector3> chemin_bout = {boutStart, element};
@@ -487,8 +487,11 @@ void TorchRenderer::setCameraMatrices(const float *viewMatrix,
   fire_renderer_.setCameraMatrices(viewMatrix,projectionMatrix);
 }
 
-void TorchRenderer::updateChemin(std::vector<Vector3> &newChemin) {
+void TorchRenderer::updateChemin(std::vector<Vector3>& newChemin,float rayon_manche,float rayon_bout, float hauteur_bout) {
   chemin_ = newChemin;
+  m_rayon_manche_ = rayon_manche;
+  m_rayon_bout_ = rayon_bout;
+  m_hauteur_bout_ = hauteur_bout;
   std::vector<Vertex> vertex;
   std::vector<TriangleIndices> indices;
   genManche(vertex,indices);
@@ -514,6 +517,7 @@ void TorchRenderer::updateChemin(std::vector<Vector3> &newChemin) {
 
   vec3 originFire = {newChemin.back().x, newChemin.back().y + m_hauteur_bout_, newChemin.back().z};
   fire_renderer_.setOrigin(originFire);
+  fire_renderer_.setRayonBase(m_rayon_bout_);
   fire_renderer_.update();
   glBindVertexArray(0);
 }

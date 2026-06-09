@@ -202,11 +202,35 @@ void App::display()
             changement = true;
     }
 
+    ImGui::Separator();
+    ImGui::Text("Haut de la torche");
+    ImGui::Separator();
+    ImGui::PushID("En-tête-Rayon");
+
+    ImGui::Text("Rayon:");
+    ImGui::SameLine();
+    changement = changement ||ImGui::SliderFloat("##float",&m_rayonBout,0.01f,1.f);
+    ImGui::PopID();
+
+    ImGui::Text("Hauteur");
+    ImGui::PushID("En-tête-Hauteur");
+    ImGui::SameLine();
+    changement = changement ||ImGui::SliderFloat("##float",&m_hauteurBout,0.01f,2s.f);
+    ImGui::PopID();
+
+    ImGui::Separator();
+    ImGui::Text("Manche");
+    ImGui::Separator();
+    ImGui::PushID("Manche-Rayon");
+    ImGui::Text("Rayon:");
+    ImGui::SameLine();
+    changement = changement ||ImGui::SliderFloat("##float",&m_rayonManche,0.01f,1.f);
+    ImGui::PopID();
     ImGui::End();
     ImGui::Render();
 
     if (changement) {
-        m_renderer.updateChemin(m_chemin);
+        m_renderer.updateChemin(m_chemin,m_rayonManche,m_rayonBout,m_hauteurBout);
         changement = false;
     }
 

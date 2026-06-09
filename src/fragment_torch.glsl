@@ -39,7 +39,7 @@ void main()
     //speculaire
     vec3 viewDirection = normalize(uCameraPosition - vertexPosition);
     vec3 reflectDirection = reflect(-lightDirection, normal);
-    float specular = pow(max(dot(viewDirection, reflectDirection), 0.0),32.0);
+    float specular = pow(max(dot(viewDirection, reflectDirection), 0.0),8.0);
     vec3 speculaire = specular * lightColor * attenuation;
 
     vec3 phong = ambiant + diffuse + speculaire;
